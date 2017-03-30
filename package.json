@@ -2,6 +2,7 @@
   "name": "cryptofolio",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://crptm.github.io/cryptofolio/",
   "dependencies": {
     "react": "^15.4.2",
     "react-dom": "^15.4.2"
