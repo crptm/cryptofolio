@@ -30,7 +30,13 @@ export default class Container extends Component {
       return null;
     }
 
-    return <App {...this.state.state} addSymbol={this.handleAddSymbol} />;
+    return (
+      <App
+        {...this.state.state}
+        addSymbol={this.handleAddSymbol}
+        changeSymbol={this.handleChangeSymbol}
+      />
+    );
   }
 
   handleAddSymbol = (amount: number, symbol: string) => {
@@ -44,6 +50,20 @@ export default class Container extends Component {
     } else {
       const oldVal = symbols[index];
       symbols[index] = { symbol, amount: amount + oldVal.amount };
+    }
+    this.storeState({ ...this.state.state, symbols });
+  };
+
+  handleChangeSymbol = (amount: number, symbol: string) => {
+    if (!this.state.state) {
+      throw new Error("should never happen");
+    }
+    const symbols = this.state.state.symbols || [];
+    const index = symbols.findIndex(x => x.symbol === symbol);
+    if (index === -1) {
+      throw new Error("should never happen");
+    } else {
+      symbols[index] = { symbol, amount };
     }
     this.storeState({ ...this.state.state, symbols });
   };

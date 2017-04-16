@@ -21,7 +21,12 @@ function Symbols(props) {
   return (
     <div>
       {props.symbols.map(x => (
-        <SymbolRow key={x.symbol} symbol={x.symbol} amount={x.amount} />
+        <SymbolRow
+          key={x.symbol}
+          symbol={x.symbol}
+          amount={x.amount}
+          onChange={props.onChange}
+        />
       ))}
       <div style={{ display: "flex" }}>
         <div style={{ width: 150 }}>TOTAL</div>
@@ -37,18 +42,91 @@ function Symbols(props) {
   );
 }
 
-function SymbolRow(props) {
-  const value = getValue(props.symbol, props.amount);
+class SymbolRow extends React.Component {
+  state = {
+    editing: false,
+    amount: ""
+  };
 
-  return (
-    <div style={{ display: "flex" }}>
-      <div style={{ width: 50 }}>{props.symbol}</div>
-      <div style={{ width: 100, textAlign: "right" }}>{props.amount}</div>
-      <div style={{ width: 100, textAlign: "right" }}>
-        ${value === null ? "???" : value.toFixed(2)}
+  render() {
+    const { symbol, amount } = this.props;
+    const value = getValue(symbol, amount);
+
+    return (
+      <div style={{ display: "flex" }}>
+        <div style={{ width: 50 }}>{symbol}</div>
+        <div style={{ width: 100, textAlign: "right" }}>
+          {this.state.editing
+            ? <input
+                name="amount"
+                value={this.state.amount}
+                placeholder="amount"
+                onChange={this.handleChange}
+              />
+            : amount}
+        </div>
+        <div style={{ width: 100, textAlign: "right" }}>
+          ${value === null ? "???" : value.toFixed(2)}
+        </div>
+        <div style={{ marginLeft: 10 }}>
+          {this.state.editing
+            ? [
+                <a
+                  onClick={this.handleSave}
+                  key={"save"}
+                  style={{
+                    textDecoration: "underline",
+                    cursor: "pointer"
+                  }}
+                >
+                  Save
+                </a>,
+                " ",
+                <a
+                  key={"cancel"}
+                  onClick={this.handleCancel}
+                  style={{
+                    textDecoration: "underline",
+                    cursor: "pointer"
+                  }}
+                >
+                  Cancel
+                </a>
+              ]
+            : <a
+                onClick={this.handleEdit}
+                style={{
+                  textDecoration: "underline",
+                  cursor: "pointer"
+                }}
+              >
+                {this.state.editing ? "Save" : "Edit"}
+              </a>}
+
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  handleEdit = () => {
+    this.setState({ editing: true, amount: this.props.amount });
+  };
+
+  handleChange = (e: SyntheticInputEvent) => {
+    this.setState({ amount: e.target.value });
+  };
+
+  handleCancel = () => {
+    this.setState({ editing: false });
+  };
+
+  handleSave = () => {
+    const amount = isNaN(+this.state.amount)
+      ? this.props.amount
+      : +this.state.amount;
+    this.props.onChange(amount, this.props.symbol);
+    this.setState({ editing: false });
+  };
 }
 
 class AddSymbol extends React.Component {
@@ -95,12 +173,16 @@ class AddSymbol extends React.Component {
 export default class App extends React.Component {
   props: {
     addSymbol: (amount: number, symbol: string) => void,
+    changeSymbol: (amount: number, symbol: string) => void,
     symbols: SymbolRecordT[]
   };
   render() {
     return (
       <div>
-        <Symbols symbols={this.props.symbols} />
+        <Symbols
+          symbols={this.props.symbols}
+          onChange={this.props.changeSymbol}
+        />
         <AddSymbol add={this.props.addSymbol} />
       </div>
     );
