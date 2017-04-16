@@ -1,11 +1,17 @@
+// @flow
 import React from "react";
 import "./App.css";
 
 import TickerData from "./mock.json";
 
-function getValue(symbol, amount) {
-  const data = TickerData.find(x => x.symbol === symbol);
-  return (+data.price_usd * amount).toFixed(2);
+const Data: TickerDataT = TickerData;
+
+function getValue(symbol: string, amount: number) {
+  const data = Data.find(x => x.symbol === symbol);
+  if (typeof data === "undefined") {
+    return null;
+  }
+  return +data.price_usd * amount;
 }
 
 function Symbols(props) {
@@ -22,12 +28,14 @@ function Symbols(props) {
 }
 
 function SymbolRow(props) {
+  const value = getValue(props.symbol, props.amount);
+
   return (
     <div style={{ display: "flex" }}>
       <div style={{ width: 50 }}>{props.symbol}</div>
       <div style={{ width: 100, textAlign: "right" }}>{props.amount}</div>
       <div style={{ width: 100, textAlign: "right" }}>
-        ${getValue(props.symbol, props.amount)}
+        ${value === null ? "???" : value.toFixed(2)}
       </div>
     </div>
   );
@@ -59,7 +67,7 @@ class AddSymbol extends React.Component {
     );
   }
 
-  handleChange = e => {
+  handleChange = (e: SyntheticInputEvent) => {
     this.setState({
       [e.target.name]: e.target.value
     });
@@ -75,10 +83,14 @@ class AddSymbol extends React.Component {
 }
 
 export default class App extends React.Component {
+  props: {
+    addSymbol: (amount: number, symbol: string) => void,
+    symbols: SymbolRecordT[]
+  };
   render() {
     return (
       <div>
-        <Symbols symbols={this.props.state.symbols} />
+        <Symbols symbols={this.props.symbols} />
         <AddSymbol add={this.props.addSymbol} />
       </div>
     );
