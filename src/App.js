@@ -23,6 +23,16 @@ function Symbols(props) {
       {props.symbols.map(x => (
         <SymbolRow key={x.symbol} symbol={x.symbol} amount={x.amount} />
       ))}
+      <div style={{ display: "flex" }}>
+        <div style={{ width: 150 }}>TOTAL</div>
+        <div style={{ width: 100, textAlign: "right" }}>
+          ${props.symbols
+            .reduce((acc, item) => {
+              return acc + getValue(item.symbol, item.amount);
+            }, 0)
+            .toFixed(2)}
+        </div>
+      </div>
     </div>
   );
 }
