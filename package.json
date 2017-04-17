@@ -16,6 +16,8 @@
     "build": "CI=  react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "updateData": "curl https://api.coinmarketcap.com/v1/ticker/ -o src/mock.json"
+    "updateData": "yarn fetchData && yarn sortData",
+    "fetchData": "curl https://api.coinmarketcap.com/v1/ticker/ -o src/mock.json",
+    "sortData": "jq -r 'sort_by(.id)' src/mock.json > src/mock.json"
   }
 }
